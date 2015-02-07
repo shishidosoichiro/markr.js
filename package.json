@@ -1,0 +1,19 @@
+{
+  "name": "markr",
+  "version": "0.0.0",
+  "description": "This is the project for learning. a simple and easy highlighting library.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "syntax",
+    "highlight"
+  ],
+  "author": "shishidosoichiro",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0"
+  }
+}
