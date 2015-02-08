@@ -1,7 +1,9 @@
-markr.js
+markr.js 
 ======================================================================
 
 This is the project for learning. a simple and easy highlighting library.
+
+[![Build Status](https://travis-ci.org/shishidosoichiro/markr.js.svg?branch=master)](https://travis-ci.org/shishidosoichiro/markr.js)
 
 ## How to use
 
