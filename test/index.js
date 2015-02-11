@@ -1,6 +1,6 @@
 var expect = require('chai').expect
 
-var word = require('./').word
+var word = require('../').word
 
 describe('#word', function(done){
 	var marker = word('test', function(src){
