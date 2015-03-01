@@ -2,9 +2,10 @@
   "name": "markr",
   "version": "0.0.0",
   "description": "This is the project for learning. a simple and easy highlighting library.",
-  "main": "index.js",
+  "main": "markr.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "mocha -R html-cov > coverage.html"
   },
   "keywords": [
     "syntax",
@@ -12,16 +13,28 @@
   ],
   "config": {
     "blanket": {
-      "pattern": "index.js",
-      "data-cover-never": "node_modules"
+      "pattern": [
+        "markr.js",
+        "tag.js"
+      ],
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ]
     }
   },
   "author": "shishidosoichiro",
-  "license": "MIT",
+  "license": "CC0",
   "devDependencies": {
     "blanket": "^1.1.6",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
+    "gulp": "^3.8.11",
+    "gulp-blanket-mocha": "0.0.4",
+    "gulp-mocha": "^2.0.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-util": "^3.0.4",
     "mocha": "^2.1.0",
     "mocha-lcov-reporter": "0.0.1"
   }

@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<form>
+						<a id="execute" class="btn btn-primary btn-lg btn-block" href="#">Execute</a>
+						<div class="form-group">
+							<label for="output">Output</label>
+							<textarea id="output" class="form-control"></textarea>
+							<div id="elapsed"></div>
+							<div id="output-html" class="well"></div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="..\tag.js"></script>
+		<script id="code" type="text/javascript">
+			// Define
+			var listgroup = tag.define('listgroup').tagName('div').hasClass('list-group')
+			var listgroupitem = tag.define('listgroupitem').tagName('a').attr('href').hasClass('list-group-item')
+			var badge = tag.define('badge').tagName('span').hasClass('badge')
+
+			// Template
+			var menu = listgroup()(function(){
+				return this.map(function(el){
+					return listgroupitem().href(el.link)
+					.hasClass(el.disabled ? 'disabled' : undefined)
+					.hasClass(el.active ? 'active' : undefined)
+					(badge()(el.num) + el.name)
+				}).join('')
+			})
+
+			// Context
+			var context = [
+				{
+					name: 'File',
+					link: 'file',
+					num: 12
+				},
+				{
+					name: 'Edit',
+					link: 'edit',
+					disabled: true,
+					num: 44
+				},
+				{
+					name: 'Selection',
+					active: true,
+					link: 'selection',
+					num: 1
+				}
+			]
+
+			// Execute
+			$(function(){
+				var $body = $(document)
+				$body.on('click', '#execute', function(){
+					var startedAt = new Date()
+					var html = menu.call(context)
+					var endedAt = new Date()
+					var elapsed = endedAt.getTime() - startedAt.getTime()
+					$body.find('#output, #output-html').html(menu.call(context))
+					$body.find('#elapsed').html(elapsed)
+				})
+				// $body.find('#execute').click()
+			})
+		</script>
+	</body>
+</html>
