@@ -99,6 +99,12 @@
 			if (regex instanceof RegExp) return regex.source
 			return regex.toString()
 		}
+		var slice = function(args, index, index2){
+			return Array.prototype.slice.call(args, index, index2);
+		}
+		var last = function(args){
+			return slice(args, -1)[0];
+		}
 		/**
 		 * match, word, prefix, quote, embed
 		 *
@@ -114,8 +120,8 @@
 			return app
 		}
 		app.word = function(words, callback){
-			words = Array.prototype.slice.call(arguments, 0, -1);
-			callback = Array.prototype.slice.call(arguments, -1)[0];
+			words = slice(arguments, 0, -1);
+			callback = last(arguments);
 			var src = '(' + words.map(function(word){
 				return '\\b' + source(word) + '\\b'
 			}).map(function(source){
@@ -125,8 +131,8 @@
 			return app
 		}
 		app.prefix = function(prefixes, callback){
-			prefixes = Array.prototype.slice.call(arguments, 0, -1);
-			callback = Array.prototype.slice.call(arguments, -1)[0];
+			prefixes = slice(arguments, 0, -1);
+			callback = last(arguments);
 			var src = '(' + prefixes.map(function(prefix){
 				return '(?:' + source(prefix) + '\\w+)'
 			}).join('|') + ')'
@@ -134,19 +140,19 @@
 			return app
 		}
 		app.quote = function(quotes, callback){
-			quotes = Array.prototype.slice.call(arguments, 0, -1);
-			callback = Array.prototype.slice.call(arguments, -1)[0];
+			quotes = slice(arguments, 0, -1);
+			callback = last(arguments);
 			var src = '(' + quotes.map(function(quote){
-				var start = quote instanceof Array ? quote[0].toString() : quote.toString()
-					, end = quote instanceof Array ? quote[1].toString() : quote.toString()
+				var start = source(quote instanceof Array ? quote[0] : quote)
+					, end = source(quote instanceof Array ? quote[1] : quote)
 				return start + '(?:[^\\\\' + end + ']|\\\\.)*?' + end
 			}).join('|') + ')'
 			add(new RegExp(src, 'g'), true, callback)
 			return app
 		}
 		app.embed = function(start, end, callback, embedded){
-			start = start.toString()
-			end = end.toString()
+			start = source(start)
+			end = source(end)
 			var src = start + '(?:(?:' + embedded.sources().join('|') + ')|[^\\1])*?' + end
 			add(new RegExp(src, 'g'), false, function(src){
 				return src.replace(new RegExp('^(' + start + ')(.*)(' + end + ')$'), function(matched, start, content, end){

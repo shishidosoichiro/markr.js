@@ -5,6 +5,28 @@ var markr = require('../markr')
   , tag = require('../tag')
 
 describe('markr', function(){
+	describe('#match', function(done){
+		it('should match a regexp.', function(done){
+			var test = markr().match(/(?:123){3}/, function(src){
+				src.should.be.equal('123123123')
+				done()
+			})
+			test('123456789012312312345678901231234567890')
+		})
+		it('should replace a string matched with a regexp.', function(){
+			var test = markr().match(/(?:123){3}/, function(src){
+				return 'TEST'
+			})
+			test('123456789012312312345678901231234567890').should.be.equal('1234567890TEST45678901231234567890')
+		})
+		it('should replace multiple strings matched with a regexp.', function(){
+			var test = markr().match(/89.?/, function(src){
+				return 'TEST'
+			})
+			test('1234567890123123123456789D1231234567890').should.be.equal('1234567TEST1231231234567TEST1231234567TEST')
+		})
+	})
+
 	describe('#word', function(){
 		it('should match a word', function(done){
 			var test = markr().word('test', function(src){
@@ -117,11 +139,10 @@ describe('markr', function(){
 			test('ab"cd"ef"ghi\\"j"klmnopqrs""tu').should.be.equal('abTESTefTESTklmnopqrsTESTtu')
 		})
 		it('should match ', function(){
-			var test = markr().quote(['//', '$'], function(src){
+			var test = markr().quote(['/\\*', '\\*/'], function(src){
 				return '<span class="comment-inline">' + src + '</span>'
 			})
-//			console.log(/^.+$/.exec('\\t// Alert\\n\\tconsole.log("that is all ok.")\\n'))
-			test('\\t// Alert\\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment-inline">// Alert</span>\\n\\tconsole.log("that is all ok.")\\n')
+			test('\\t/* Alert */\\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment-inline">/* Alert */</span>\\n\\tconsole.log("that is all ok.")\\n')
 		})
 	})
 })

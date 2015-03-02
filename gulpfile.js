@@ -25,6 +25,6 @@ gulp.task('test', function() {
 	.pipe(mocha({reporter: 'spec'}))
 })
 gulp.task('watch', function() {
-	gulp.watch(src.main.concat(src.test), ['default']);
+	gulp.watch(src.main.concat(src.test), ['test']);
 });
 gulp.task('default', ['test', 'watch']);
