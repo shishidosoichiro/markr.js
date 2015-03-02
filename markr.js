@@ -154,7 +154,7 @@
 			start = source(start)
 			end = source(end)
 			var src = start + '(?:(?:' + embedded.sources().join('|') + ')|[^\\1])*?' + end
-			add(new RegExp(src, 'g'), false, function(src){
+			add(new RegExp(src, 'g'), true, function(src){
 				return src.replace(new RegExp('^(' + start + ')(.*)(' + end + ')$'), function(matched, start, content, end){
 					return callback(start) + embedded(content) + callback(end)
 				})

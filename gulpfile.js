@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var blanket = require('gulp-blanket-mocha');
-var gutil = require('gulp-util');
 var plumber = require('gulp-plumber');
 var notify = require('gulp-notify');
 

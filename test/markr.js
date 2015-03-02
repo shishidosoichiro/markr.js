@@ -145,5 +145,35 @@ describe('markr', function(){
 			test('\\t/* Alert */\\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment-inline">/* Alert */</span>\\n\\tconsole.log("that is all ok.")\\n')
 		})
 	})
+
+	describe('#embed', function(){
+		it('should match a regexp.', function(){
+			var embedded = markr()
+			.word('get', function(src){
+				src.should.be.equal('get')
+				return '<span class="method">' + src + '</span>'
+			})
+			.word('User', function(src){
+				src.should.be.equal('User')
+				return '<span class="prototype">' + src + '</span>'
+			})
+			var i = 0
+			var test = markr().embed('\\$\\{', '\\}', function(src){
+				i++;
+				switch(i){
+				case 1:
+					src.should.be.equal('${')
+					return '<span class="start">' + src + '</span>';
+				case 2:
+					src.should.be.equal('}')
+					return '<span class="end">' + src + '</span>';
+				}
+			}, embedded)
+			test('shishido soichiro is ${User.get("shishido soichiro").name}')
+			.should.be.equal('shishido soichiro is <span class="start">${</span><span class="prototype">User</span>.<span class="method">get</span>("shishido soichiro").name<span class="end">}</span>')
+			i.should.be.equal(2)
+		})
+	})
+
 })
 
