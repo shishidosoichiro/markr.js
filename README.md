@@ -5,6 +5,7 @@ This is the project for learning. a simple and easy highlighting library.
 
 [![Build Status](https://travis-ci.org/shishidosoichiro/markr.js.svg?branch=master)](https://travis-ci.org/shishidosoichiro/markr.js)
 [![Coverage Status](https://coveralls.io/repos/shishidosoichiro/markr.js/badge.svg?branch=master)](https://coveralls.io/r/shishidosoichiro/markr.js?branch=master)
+[![Code Climate](https://codeclimate.com/github/shishidosoichiro/markr.js/badges/gpa.svg)](https://codeclimate.com/github/shishidosoichiro/markr.js)
 
 ## Install
 
