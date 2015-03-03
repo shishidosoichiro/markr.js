@@ -26,7 +26,9 @@
 			regexes.push(regex);
 		};
 		app.sources = function(){
-			return regexes.map(function(regex){return regex.source});
+			return regexes.map(function(regex){
+				return regex.source;
+			});
 		};
 
 		/*
@@ -35,11 +37,13 @@
 		 * a element structuring a tree made of a string.
 		 * 
 		 */
-		var Node = function(){this.initialize.apply(this, arguments)};
+		var Node = function(){
+			this.initialize.apply(this, arguments);
+		};
 		Node.prototype = {
 			initialize: function(children, locked, callback){
 				this.children = [].concat(children);
-				this.callback = callback || function(s){return s};
+				this.callback = callback || function(s){return s;};
 				this.locked = locked;
 			},
 			toString: function(){
@@ -50,7 +54,7 @@
 			original: function(){
 				return this.children.reduce(function(string, child){
 					return string.concat(child.original ? child.original() : child.toString());
-				}, '')
+				}, '');
 			}
 		};
 
@@ -66,7 +70,7 @@
 				var start = 0;
 				var end = 0;
 				var matched;
-				while ((matched = regex.exec(string)) != null) {
+				while ((matched = regex.exec(string)) !== null) {
 						start = matched.index;
 						if (start > end) result.push(string.substring(end, start))
 						end = start + matched[0].length;
@@ -74,7 +78,7 @@
 				}
 				if (end < string.length) result.push(string.substring(end));
 				return result;
-			}
+			};
 			var parseNode = function(node){
 				return new Node(node.children.reduce(function(list, child){
 					if (child.locked) {
@@ -87,9 +91,9 @@
 					}
 					return list.concat(child);
 				}, []), node.locked, node.callback);
-			}
+			};
 			return parseNode;
-		}
+		};
 
 		var source = function(regex){
 			if (typeof regex === 'undefined') return '';
@@ -98,13 +102,13 @@
 
 			if (regex instanceof RegExp) return regex.source;
 			return regex.toString();
-		}
+		};
 		var slice = function(args, index, index2){
 			return Array.prototype.slice.call(args, index, index2);
-		}
+		};
 		var last = function(args){
 			return slice(args, -1)[0];
-		}
+		};
 		/**
 		 * match, word, prefix, quote, embed
 		 *
@@ -118,7 +122,7 @@
 			var src = source(regex);
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
-		}
+		};
 		app.word = function(words, callback){
 			words = slice(arguments, 0, -1);
 			callback = last(arguments);
@@ -129,7 +133,7 @@
 			}).join('|') + ')'
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
-		}
+		};
 		app.prefix = function(prefixes, callback){
 			prefixes = slice(arguments, 0, -1);
 			callback = last(arguments);
@@ -138,7 +142,7 @@
 			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
-		}
+		};
 		app.quote = function(quotes, callback){
 			quotes = slice(arguments, 0, -1);
 			callback = last(arguments);
@@ -160,7 +164,7 @@
 				});
 			});
 			return app;
-		}
+		};
 
 		return app;
 	}
