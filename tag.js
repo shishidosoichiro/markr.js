@@ -11,7 +11,6 @@
 	var factory = function (name) {
 		var attrs = [];
 		var classes = [];
-		var fs = [];
 		var befores = [];
 		var afters = [];
 		var previous = '';
@@ -22,7 +21,7 @@
 					tag.before(arg);
 				});
 				return tag;
-			};
+			}
 			var classString = classes.length <= 0 ? '' : ' class="' + classes.map(call).join(' ') + '"';
 			var attrsString = attrs.length <= 0 ? '' : ' ' + attrs.map(function(a){
 				return call(a.name) + '="' + call(a.value) + '"';
@@ -57,22 +56,22 @@
 		tag.before = function(f){
 			befores.push(f);
 			return this;
-		}
+		};
 		tag.after = function(f){
 			afters.push(f);
 			return this;
-		}
+		};
 		tag.tag = function(name){
 			return factory(name).previous(tag);
-		}
+		};
 		tag.t = function(f){
 			befores.push(f);
 			return this;
-		}
+		};
 		tag.previous = function(f){
 			previous = f;
 			return this;
-		}
+		};
 		return tag;
 	};
 	var proxy = function(thisArg){
@@ -94,7 +93,9 @@
 		var definer = this[name] = function(){
 			var tag = factory(tagName);
 			attrs.forEach(function(name){
-				tag[name] = function(value){return tag.attr(name, value)};
+				tag[name] = function(value){
+					return tag.attr(name, value);
+				};
 			});
 			classes.forEach(function(name){
 				tag.hasClass(name);
