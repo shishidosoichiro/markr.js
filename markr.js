@@ -118,8 +118,12 @@
 		 * -> '<em>shishido</em> soichiro'
 		 *
 		 */
-		app.match = function(regex, callback){
-			var src = source(regex);
+		app.match = function(regexes, callback){
+			regexes = slice(arguments, 0, -1);
+			callback = last(arguments);
+			var src = '(' + regexes.map(source).map(function(source){
+				return '(?:' + source + ')';
+			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
 		};
@@ -151,7 +155,7 @@
 				var end = source(quote instanceof Array ? quote[1] : quote);
 				return start + '(?:[^\\\\' + end + ']|\\\\.)*?' + end;
 			}).join('|') + ')';
-			add(new RegExp(src, 'g'), true, callback);
+			add(new RegExp(src, 'mg'), true, callback);
 			return app;
 		};
 		app.embed = function(start, end, callback, embedded){
