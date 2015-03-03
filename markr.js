@@ -174,5 +174,4 @@
 	else {
 		module.exports = factory;
 	}
-})()
-
+})();
