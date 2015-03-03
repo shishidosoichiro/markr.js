@@ -139,11 +139,26 @@ describe('markr', function(){
 			test('ab"cd"ef"ghi\\"j"klmnopqrs""tu').should.be.equal('abTESTefTESTklmnopqrsTESTtu')
 		})
 		it('should match ', function(){
-			var test = markr().quote(['/\\*', '\\*/'], function(src){
-				return '<span class="comment-inline">' + src + '</span>'
+			var test = markr().quote(['\\/\\*', '\\*\\/'], function(src){
+				return '<span class="comment">' + src + '</span>'
 			})
-			test('\\t/* Alert */\\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment-inline">/* Alert */</span>\\n\\tconsole.log("that is all ok.")\\n')
+			test('\\t/* Alert */\\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment">/* Alert */</span>\\n\\tconsole.log("that is all ok.")\\n')
 		})
+		it('should match ', function(){
+			var test = markr().quote(/\//, function(src){
+				return '<span class="regex">' + src + '</span>'
+			})
+			test(' /shishido/ ').should.be.equal(' <span class="regex">/shishido/</span> ')
+		})
+
+		/*
+		it('should match ', function(){
+			var test = markr().quote(['//', '$'], function(src){
+				return '<span class="comment">' + src + '</span>'
+			})
+			test('\\t// Alert \\n\\tconsole.log("that is all ok.")\\n').should.be.equal('\\t<span class="comment">// Alert </span>\\n\\tconsole.log("that is all ok.")\\n')
+		})
+		*/
 	})
 
 	describe('#embed', function(){
