@@ -27,10 +27,11 @@ var markr = require('markr')
   , tag = markr.tag
 
 var f = markr
-.match(/\b(if|else)\b/g, tag('strong'))
-.match(/\b(print)\b/g, tag('em'))
+.word('if', 'else', tag('strong'))
+.word('print', tag('em'))
+.quote('"', tag('span').hasClass('quoted'))
 
 var text = 'if (a == 1) {print a} else {print "not 1"}'
 console.log(f(text))
--> '<strong>if</strong> (a == 1) {<em>print</em> a} <strong>else</strong> {<em>print</em> "not 1"}'
+-> '<strong>if</strong> (a == 1) {<em>print</em> a} <strong>else</strong> {<em>print</em> <span class="quoted">"not 1"</span>}'
 ```
