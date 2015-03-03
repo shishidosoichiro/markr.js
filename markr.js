@@ -49,7 +49,7 @@
 			toString: function(){
 				return this.callback(this.children.reduce(function(string, child){
 					return string.concat(child.toString());
-				}, ''))
+				}, ''));
 			},
 			original: function(){
 				return this.children.reduce(function(string, child){
@@ -72,7 +72,7 @@
 				var matched;
 				while ((matched = regex.exec(string)) !== null) {
 						start = matched.index;
-						if (start > end) result.push(string.substring(end, start))
+						if (start > end) result.push(string.substring(end, start));
 						end = start + matched[0].length;
 						result.push(new Node(string.substring(start, end), locked, callback));
 				}
@@ -130,7 +130,7 @@
 				return '\\b' + source(word) + '\\b';
 			}).map(function(source){
 				return '(?:' + source + ')';
-			}).join('|') + ')'
+			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
 		};
@@ -153,7 +153,7 @@
 			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
 			return app;
-		}
+		};
 		app.embed = function(start, end, callback, embedded){
 			start = source(start);
 			end = source(end);
@@ -167,7 +167,7 @@
 		};
 
 		return app;
-	}
+	};
 	if (typeof module === 'undefined') {
 		this.markr = factory;
 	}
