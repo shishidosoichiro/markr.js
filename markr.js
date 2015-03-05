@@ -15,20 +15,42 @@
 		 * 
 		 */
 		var app = function(string){
-			return parses.reduce(function(node, parse){
-				return parse(node);
-			}, new Node(string)).toString();
+			var result = parse(app.sources(), callbacks, string);
+			return new Node(result).toString();
 		};
-		var parses = [];
 		var regexes = [];
+		var callbacks = [];
 		var add = function(regex, locked, callback){
-			parses.push(parse(regex, true, callback));
 			regexes.push(regex);
+			callbacks.push(callback);
 		};
 		app.sources = function(){
-			return regexes.map(function(regex){
-				return regex.source;
-			});
+			return regexes.map(pick('source'));
+		};
+		/*
+		 * Utilities
+		 * 
+		 * a element structuring a tree made of a string.
+		 * 
+		 */
+		var pick = function(key){
+			return function(src){
+				return src[key];
+			};
+		};
+		var source = function(regex){
+			if (typeof regex === 'undefined') return '';
+			else if (typeof regex === 'string') return regex;
+			else if (typeof regex !== 'object') return regex;
+
+			if (regex instanceof RegExp) return regex.source;
+			return regex.toString();
+		};
+		var slice = function(args, index, index2){
+			return Array.prototype.slice.call(args, index, index2);
+		};
+		var last = function(args){
+			return slice(args, -1)[0];
 		};
 
 		/*
@@ -41,7 +63,7 @@
 			this.initialize.apply(this, arguments);
 		};
 		Node.prototype = {
-			initialize: function(children, locked, callback){
+			initialize: function(children, callback, locked){
 				this.children = [].concat(children);
 				this.callback = callback || function(s){return s;};
 				this.locked = locked;
@@ -64,51 +86,32 @@
 		 * parse a string to a tree structure.
 		 * 
 		 */
-		var parse = function(regex, locked, callback){
-			var parseString = function(string){
-				var result = [];
-				var start = 0;
-				var end = 0;
-				var matched;
-				while ((matched = regex.exec(string)) !== null) {
-						start = matched.index;
-						if (start > end) result.push(string.substring(end, start));
-						end = start + matched[0].length;
-						result.push(new Node(string.substring(start, end), locked, callback));
-				}
-				if (end < string.length) result.push(string.substring(end));
-				return result;
-			};
-			var parseNode = function(node){
-				return new Node(node.children.reduce(function(list, child){
-					if (child.locked) {
-					}
-					else if (child.children) {
-						child = parseNode(child);
-					}
-					else {
-						child = parseString(child);
-					}
-					return list.concat(child);
-				}, []), node.locked, node.callback);
-			};
-			return parseNode;
+		var parse = function(sources, callbacks, string){
+			var src = '(?:' + sources.map(function(src){
+				return '(' + src + ')'
+			}).join('|') + ')';
+			var regex = new RegExp(src, 'mg');
+			var result = [];
+			var start = 0;
+			var end = 0;
+			var matched;
+			while ((matched = regex.exec(string)) !== null) {
+				start = matched.index;
+				var callback;
+				matched.some(function(content, i){
+					if (i === 0) return false;
+					if (!content) return false;
+					callback = callbacks[i - 1];
+					return true;
+				})
+				if (start > end) result.push(string.substring(end, start));
+				end = start + matched[0].length;
+				result.push(new Node(string.substring(start, end), callback));
+			}
+			if (end < string.length) result.push(string.substring(end));
+			return result;
 		};
 
-		var source = function(regex){
-			if (typeof regex === 'undefined') return '';
-			else if (typeof regex === 'string') return regex;
-			else if (typeof regex !== 'object') return regex;
-
-			if (regex instanceof RegExp) return regex.source;
-			return regex.toString();
-		};
-		var slice = function(args, index, index2){
-			return Array.prototype.slice.call(args, index, index2);
-		};
-		var last = function(args){
-			return slice(args, -1)[0];
-		};
 		/**
 		 * match, word, prefix, quote, embed
 		 *
@@ -121,7 +124,7 @@
 		app.match = function(regexes, callback){
 			regexes = slice(arguments, 0, -1);
 			callback = last(arguments);
-			var src = '(' + regexes.map(source).map(function(source){
+			var src = '(?:' + regexes.map(source).map(function(source){
 				return '(?:' + source + ')';
 			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
@@ -130,7 +133,7 @@
 		app.word = function(words, callback){
 			words = slice(arguments, 0, -1);
 			callback = last(arguments);
-			var src = '(' + words.map(function(word){
+			var src = '(?:' + words.map(function(word){
 				return '\\b' + source(word) + '\\b';
 			}).map(function(source){
 				return '(?:' + source + ')';
@@ -141,7 +144,7 @@
 		app.prefix = function(prefixes, callback){
 			prefixes = slice(arguments, 0, -1);
 			callback = last(arguments);
-			var src = '(' + prefixes.map(function(prefix){
+			var src = '(?:' + prefixes.map(function(prefix){
 				return '(?:' + source(prefix) + '\\w+)';
 			}).join('|') + ')';
 			add(new RegExp(src, 'g'), true, callback);
@@ -150,7 +153,7 @@
 		app.quote = function(quotes, callback){
 			quotes = slice(arguments, 0, -1);
 			callback = last(arguments);
-			var src = '(' + quotes.map(function(quote){
+			var src = '(?:' + quotes.map(function(quote){
 				var start = source(quote instanceof Array ? quote[0] : quote);
 				var end = source(quote instanceof Array ? quote[1] : quote);
 				return start + '(?:[^\\\\' + end + ']|\\\\.)*?' + end;

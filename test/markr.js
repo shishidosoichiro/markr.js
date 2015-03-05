@@ -132,7 +132,7 @@ describe('markr', function(){
 			})
 			test('ab"cd"ef"gh\'i\'j"klmnop\'q\'rs""tu').should.be.equal('abTESTefTESTklmnopTESTrsTESTtu')
 		})
-		it('should escape a quote', function(){
+		it('should escape a quote with \\', function(){
 			var test = markr().quote('"', function(src){
 				return 'TEST'
 			})
@@ -188,6 +188,32 @@ describe('markr', function(){
 			.should.be.equal('shishido soichiro is <span class="start">${</span><span class="prototype">User</span>.<span class="method">get</span>("shishido soichiro").name<span class="end">}</span>')
 			i.should.be.equal(2)
 		})
+	})
+
+	it('should match multiple settings.', function(){
+		var test = markr()
+		.match(/(?:123){3}/, function(src){
+			src.should.be.equal('123123123')
+			return 'match'
+		})
+		.word('shishido', function(src){
+			src.should.be.equal('shishido')
+			return 'SHISHIDO'
+		})
+		test('123456789012312312345678901231234567890 shishido eeeeee')
+		.should.be.equal('1234567890match45678901231234567890 SHISHIDO eeeeee');
+	})
+
+	it('should match correctly competitive regexps.', function(){
+		var test = markr()
+		.quote('"', function(src){
+			return '#quote#'
+		})
+		.match(/\/(?:(?!\/).)*\//, function(src){
+			return '#regex#'
+		})
+		test('var matched = /shis"h"ido/.exec("shish/i/do");')
+		.should.be.equal('var matched = #regex#.exec(#quote#);');
 	})
 
 })
