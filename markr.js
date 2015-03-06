@@ -15,22 +15,42 @@
 		 * 
 		 */
 		var app = function(string){
-			var result = parse(app.sources(), callbacks, string);
-			return new Node(result).toString();
+			var regex = app.regex();
+			var result = [];
+			var end = 0;
+			var matched;
+			while ((matched = regex.exec(string)) !== null) {
+				var index = findIndex(matched, 1, function(el){
+					return el;
+				});
+				var callback = callbacks[index - 1];
+				var start = matched.index;
+				if (start > end) result.push(string.substring(end, start));
+				end = start + matched[0].length;
+				result.push(callback(string.substring(start, end)));
+			}
+			if (end < string.length) result.push(string.substring(end));
+			return result.join('');
 		};
-		var regexes = [];
+		var sources = [];
 		var callbacks = [];
-		var add = function(regex, locked, callback){
-			regexes.push(regex);
+		var add = function(src, callback){
+			sources.push(src);
 			callbacks.push(callback);
 		};
 		app.sources = function(){
-			return regexes.map(pick('source'));
+			return sources;
+		};
+		app.source = function(){
+			return '(?:' + sources.map(function(src){
+				return '(' + src + ')'
+			}).join('|') + ')';
+		};
+		app.regex = function(){
+			return new RegExp(app.source(), 'mg');
 		};
 		/*
 		 * Utilities
-		 * 
-		 * a element structuring a tree made of a string.
 		 * 
 		 */
 		var pick = function(key){
@@ -52,64 +72,16 @@
 		var last = function(args){
 			return slice(args, -1)[0];
 		};
-
-		/*
-		 * Node
-		 * 
-		 * a element structuring a tree made of a string.
-		 * 
-		 */
-		var Node = function(){
-			this.initialize.apply(this, arguments);
-		};
-		Node.prototype = {
-			initialize: function(children, callback, locked){
-				this.children = [].concat(children);
-				this.callback = callback || function(s){return s;};
-				this.locked = locked;
-			},
-			toString: function(){
-				return this.callback(this.children.reduce(function(string, child){
-					return string.concat(child.toString());
-				}, ''));
-			},
-			original: function(){
-				return this.children.reduce(function(string, child){
-					return string.concat(child.original ? child.original() : child.toString());
-				}, '');
-			}
-		};
-
-		/*
-		 * parse
-		 * 
-		 * parse a string to a tree structure.
-		 * 
-		 */
-		var parse = function(sources, callbacks, string){
-			var src = '(?:' + sources.map(function(src){
-				return '(' + src + ')'
-			}).join('|') + ')';
-			var regex = new RegExp(src, 'mg');
-			var result = [];
-			var start = 0;
-			var end = 0;
-			var matched;
-			while ((matched = regex.exec(string)) !== null) {
-				start = matched.index;
-				var callback;
-				matched.some(function(content, i){
-					if (i === 0) return false;
-					if (!content) return false;
-					callback = callbacks[i - 1];
+		var findIndex = function(array, start, callback){
+			var index;
+			array.some(function(el, i){
+				if (i < start) return false;
+				if (callback.apply(this, arguments)) {
+					index = i;
 					return true;
-				})
-				if (start > end) result.push(string.substring(end, start));
-				end = start + matched[0].length;
-				result.push(new Node(string.substring(start, end), callback));
-			}
-			if (end < string.length) result.push(string.substring(end));
-			return result;
+				}
+			})
+			return index;
 		};
 
 		/**
@@ -127,7 +99,7 @@
 			var src = '(?:' + regexes.map(source).map(function(source){
 				return '(?:' + source + ')';
 			}).join('|') + ')';
-			add(new RegExp(src, 'g'), true, callback);
+			add(src, callback);
 			return app;
 		};
 		app.word = function(words, callback){
@@ -138,7 +110,7 @@
 			}).map(function(source){
 				return '(?:' + source + ')';
 			}).join('|') + ')';
-			add(new RegExp(src, 'g'), true, callback);
+			add(src, callback);
 			return app;
 		};
 		app.prefix = function(prefixes, callback){
@@ -147,7 +119,7 @@
 			var src = '(?:' + prefixes.map(function(prefix){
 				return '(?:' + source(prefix) + '\\w+)';
 			}).join('|') + ')';
-			add(new RegExp(src, 'g'), true, callback);
+			add(src, callback);
 			return app;
 		};
 		app.quote = function(quotes, callback){
@@ -158,14 +130,14 @@
 				var end = source(quote instanceof Array ? quote[1] : quote);
 				return start + '(?:[^\\\\' + end + ']|\\\\.)*?' + end;
 			}).join('|') + ')';
-			add(new RegExp(src, 'mg'), true, callback);
+			add(src, callback);
 			return app;
 		};
 		app.embed = function(start, end, callback, embedded){
 			start = source(start);
 			end = source(end);
 			var src = start + '(?:(?:' + embedded.sources().join('|') + ')|[^\\1])*?' + end;
-			add(new RegExp(src, 'g'), true, function(src){
+			add(src, function(src){
 				return src.replace(new RegExp('^(' + start + ')(.*)(' + end + ')$'), function(matched, start, content, end){
 					return callback(start) + embedded(content) + callback(end);
 				});
