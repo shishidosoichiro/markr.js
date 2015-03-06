@@ -53,11 +53,6 @@
 		 * Utilities
 		 * 
 		 */
-		var pick = function(key){
-			return function(src){
-				return src[key];
-			};
-		};
 		var source = function(regex){
 			if (typeof regex === 'undefined') return '';
 			else if (typeof regex === 'string') return regex;
