@@ -5,7 +5,7 @@
   "main": "markr.js",
   "scripts": {
     "test": "mocha",
-    "coverage": "mocha -R html-cov > coverage.html"
+    "coverage": "mocha --require blanket -R html-cov > coverage.html"
   },
   "keywords": [
     "syntax",

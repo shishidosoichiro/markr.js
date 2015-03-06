@@ -1,4 +1,4 @@
 language: node_js
 node_js:
   - "0.10"
-script: mocha --reporter mocha-lcov-reporter | coveralls
+script: mocha --require blanket --reporter mocha-lcov-reporter | coveralls
