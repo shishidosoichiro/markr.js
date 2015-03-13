@@ -25,6 +25,12 @@ describe('markr', function(){
 			})
 			test('1234567890123123123456789D1231234567890').should.be.equal('1234567TEST1231231234567TEST1231234567TEST')
 		})
+		it('should be able to capture', function(){
+			var test = markr().match(/\*(.+?)\*/, function(src, text){
+				return '<em>' + text + '</em>'
+			})
+			test('Michael *Air* Jordan').should.be.equal('Michael <em>Air</em> Jordan')
+		})
 	})
 
 	describe('#word', function(){
@@ -187,6 +193,21 @@ describe('markr', function(){
 			test('shishido soichiro is ${User.get("shishido soichiro").name}')
 			.should.be.equal('shishido soichiro is <span class="start">${</span><span class="prototype">User</span>.<span class="method">get</span>("shishido soichiro").name<span class="end">}</span>')
 			i.should.be.equal(2)
+		})
+	})
+
+	describe('#captureCount', function(){
+		it('should return captureCount', function(){
+			var test = markr()
+			.word('shishido', function(){return 'TEST1'})
+			.word('soichiro', function(){return 'TEST2'});
+			test.captureCount().should.be.equal(2);
+		})
+		it('should return captureCount 2', function(){
+			var test = markr()
+			.match(/sh(ish)ido/, function(){return 'TEST1'})
+			.word('soichiro', function(){return 'TEST2'});
+			test.captureCount().should.be.equal(3);
 		})
 	})
 

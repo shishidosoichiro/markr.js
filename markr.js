@@ -15,39 +15,48 @@
 		 * 
 		 */
 		var app = function(string){
-			var regex = app.regex();
 			var result = [];
 			var end = 0;
-			var matched;
-			while ((matched = regex.exec(string)) !== null) {
-				var index = findIndex(matched, 1, function(el){
+			match(app.regex(), string, function(matched){
+				var position = findIndex(matched.slice(1), function(el){
 					return el;
+				}) + 1;
+				var setting = find(settings, function(setting){
+					return setting.position === position;
 				});
-				var callback = callbacks[index - 1];
 				var start = matched.index;
 				if (start > end) result.push(string.substring(end, start));
 				end = start + matched[0].length;
-				result.push(callback(string.substring(start, end)));
-			}
+				var captured = matched.slice(setting.position, setting.position + setting.count);
+				result.push(setting.callback.apply(undefined, captured));
+			});
 			if (end < string.length) result.push(string.substring(end));
 			return result.join('');
 		};
-		var sources = [];
-		var callbacks = [];
+		var settings = [];
 		var add = function(src, callback){
-			sources.push(src);
-			callbacks.push(callback);
+			var setting = {
+				source: src,
+				callback: callback,
+				count: captureCount(src) + 1
+			};
+			var previous = settings[settings.length - 1];
+			setting.position = previous ? previous.position + previous.count : 1;
+			settings.push(setting)
 		};
 		app.sources = function(){
-			return sources;
+			return pluck(settings, 'source');
 		};
 		app.source = function(){
-			return '(?:' + sources.map(function(src){
-				return '(' + src + ')'
+			return '(?:' + app.sources().map(function(src){
+				return '(' + src + ')';
 			}).join('|') + ')';
 		};
 		app.regex = function(){
 			return new RegExp(app.source(), 'mg');
+		};
+		app.captureCount = function(){
+			return captureCount(app.source());
 		};
 		/*
 		 * Utilities
@@ -61,22 +70,41 @@
 			if (regex instanceof RegExp) return regex.source;
 			return regex.toString();
 		};
-		var slice = function(args, index, index2){
-			return Array.prototype.slice.call(args, index, index2);
+		var captureCount = function(src){
+			return new RegExp('(?:' + source(src) + '|(any))').exec('any').length - 2;
 		};
-		var last = function(args){
-			return slice(args, -1)[0];
+		var match = function(regex, string, callback){
+			var matched;
+			while ((matched = regex.exec(string)) !== null) {
+				callback(matched);
+			}
+		}
+		var slice = function(array, begin, end){
+			return Array.prototype.slice.call(array, begin, end);
 		};
-		var findIndex = function(array, start, callback){
+		var last = function(array){
+			return slice(array, -1)[0];
+		};
+		var findIndex = function(array, callback){
 			var index;
 			array.some(function(el, i){
-				if (i < start) return false;
-				if (callback.apply(this, arguments)) {
-					index = i;
-					return true;
-				}
+				index = i;
+				return callback.apply(this, arguments)
 			})
 			return index;
+		};
+		var find = function(array, callback){
+			var found;
+			array.some(function(el){
+				found = el;
+				return callback.apply(this, arguments)
+			})
+			return found;
+		};
+		var pluck = function(collection, key){
+			return collection.map(function(el){
+				return el[key];
+			})
 		};
 
 		/**
@@ -117,13 +145,19 @@
 			add(src, callback);
 			return app;
 		};
-		app.quote = function(quotes, callback){
+		app.quote = function(quotes, options, callback){
 			quotes = slice(arguments, 0, -1);
 			callback = last(arguments);
+			options = last(quotes);
+			if (typeof options === 'string' || options instanceof Array || options instanceof RegExp) {
+				options = undefined;
+			}
+			var escape = source(options ? options.escape : /\\./);
 			var src = '(?:' + quotes.map(function(quote){
 				var start = source(quote instanceof Array ? quote[0] : quote);
 				var end = source(quote instanceof Array ? quote[1] : quote);
-				return start + '(?:[^\\\\' + end + ']|\\\\.)*?' + end;
+				return start + '(?:[^\\\\' + end + ']|' + escape + ')*?' + end;
+//				return start + '(?:(?:(?!' + end + ').)*|' + escape + ')*?' + end;
 			}).join('|') + ')';
 			add(src, callback);
 			return app;
