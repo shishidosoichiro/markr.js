@@ -5,7 +5,7 @@
   "main": "markr.js",
   "scripts": {
     "test": "mocha",
-    "coverage": "mocha --require blanket -R html-cov > coverage.html"
+    "coverage": "mocha --require blanket --reporter html-cov > coverage.html"
   },
   "keywords": [
     "syntax",
@@ -19,6 +19,7 @@
       ],
       "data-cover-never": [
         "node_modules",
+        "example",
         "test"
       ]
     }
@@ -34,7 +35,7 @@
     "gulp-mocha": "^2.0.0",
     "gulp-notify": "^2.2.0",
     "gulp-plumber": "^0.6.6",
-    "mocha": "^2.1.0",
+    "mocha": "~2.1.0",
     "mocha-lcov-reporter": "0.0.1"
   }
 }
