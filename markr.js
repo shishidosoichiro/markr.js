@@ -37,7 +37,7 @@
 		var add = function(src, callback){
 			var setting = {
 				source: src,
-				callback: callback,
+				callback: functionalize(callback),
 				count: captureCount(src) + 1
 			};
 			var previous = settings[settings.length - 1];
@@ -105,6 +105,9 @@
 			return collection.map(function(el){
 				return el[key];
 			})
+		};
+		var functionalize = function(f){
+			return typeof f === 'function' ? f : function(){return f};
 		};
 
 		/**

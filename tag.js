@@ -28,7 +28,9 @@
 			}).join(' ');
 			var before = befores.map(call).join('');
 			var after = afters.map(call).join('');
-			return call(previous) + '<' + call(name) + classString + attrsString + '>' + before + call(src) + after + '</' + call(name) + '>';
+			var text = before + call(src) + after;
+			if (text === '') return call(previous) + '<' + call(name) + classString + attrsString + ' />'
+			else return call(previous) + '<' + call(name) + classString + attrsString + '>' + text + '</' + call(name) + '>';
 		};
 		tag.attr = function(name, value){
 			if (typeof name === 'undefined') {}
@@ -40,6 +42,7 @@
 			else if (typeof name === 'object') {
 				attrs.push(name);
 			}
+			else if (typeof value === 'undefined') {}
 			else attrs.push({name: name, value: value});
 			return this;
 		};

@@ -8,7 +8,7 @@ describe('tag', function(){
 		tag('h1')('text').should.be.equal('<h1>text</h1>')
 	})
 	it('should wrap <name>...</name>.', function(){
-		tag('h1')(tag('small'))('text').should.be.equal('<h1><small></small>text</h1>')
+		tag('h1')(tag('small'))('text').should.be.equal('<h1><small />text</h1>')
 	})
 
 	describe('#attr', function(){

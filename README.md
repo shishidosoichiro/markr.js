@@ -36,3 +36,12 @@ var text = 'if (a == 1) {print a} else {print "not 1"}'
 console.log(f(text))
 -> '<strong>if</strong> (a == 1) {<em>print</em> a} <strong>else</strong> {<em>print</em> <span class="quoted">"not 1"</span>}'
 ```
+
+* list1
+* list2
+    * list2-1
+    * list2-2
+* list3
+
+* list1
+* list2
