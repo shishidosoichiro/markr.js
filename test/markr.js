@@ -2,7 +2,6 @@ var expect = require('chai').expect
 require('chai').should()
 
 var markr = require('../markr')
-  , tag = require('../tag')
 
 describe('markr', function(){
 	describe('#match', function(done){
