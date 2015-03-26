@@ -14,12 +14,10 @@
   "config": {
     "blanket": {
       "pattern": [
-        "markr.js",
-        "tag.js"
+        "markr.js"
       ],
       "data-cover-never": [
         "node_modules",
-        "example",
         "test"
       ]
     }
